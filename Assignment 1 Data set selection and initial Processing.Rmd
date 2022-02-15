@@ -1,0 +1,791 @@
+---
+title: "Assignment 1: Data set selection and initial Processing"
+author: "Xu Xinyi"
+date: "12 February 2022"
+header-includes:
+   - \usepackage{bbm}
+   - \usepackage{threeparttable}
+   - \usepackage{booktabs}
+   - \usepackage{expex}
+output:
+  html_notebook:
+    df_print: paged
+  pdf_document: 
+    latex_engine: xelatex
+---
+The setup of the tile part imitated the assignment I did for STA303. 
+
+
+# Loading required packages if they are not installed. 
+```{r setup}
+# We first setup the work space by loading all the packages needed, we would 
+# install them if they are outdated or not installed. 
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+if (!requireNamespace("GEOquery", quietly = TRUE))
+    BiocManager::install("GEOquery")
+if (!requireNamespace("biomaRt", quietly = TRUE))
+    BiocManager::install("BiomaRt")
+if (!requireNamespace("knitr", quietly = TRUE))
+    BiocManager::install("knitr")
+if (!requireNamespace("AnnotationDbi", quietly = TRUE))
+    BiocManager::install("AnnotationDbi")
+if (!requireNamespace("annotate", quietly = TRUE))
+    BiocManager::install("annotate")
+if (!requireNamespace("org.Hs.eg.db", quietly = TRUE))
+    BiocManager::install("org.Hs.eg.db")
+if (!requireNamespace("edgeR", quietly = TRUE))
+    BiocManager::install("edgeR")
+
+# Import the packages we need.  
+library("BiocManager")
+library("GEOquery")
+library("biomaRt")
+library("knitr")
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+library("annotate")
+library("edgeR")
+```
+
+# Select an Expression Data Set
+The data set selected was called: Transcriptomic Similarities and Differences in Host Response between SARS-CoV-2 and Other Viral Infection. The link is: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641. \newline
+
+All relative codes and thoughts were documented on Journal page: https://github.com/bcb420-2022/Xinyi_Xu/wiki/6.---Finding-Data-Set. \newline
+
+
+# Clean the data and map to HUGO symbols
+## Initial Setup and Skim the Data
+```{r Data cleaning 1}
+# We first import the selected data set into the working space. 
+# After first creating GSE152641, we could notice that it is a directory.
+# Thus, we updated the code based on codes provided in Lecture 3, by checking 
+# if the directory exists. 
+if (!dir.exists('GSE152641')){
+  gsefiles = getGEOSuppFiles('GSE152641')
+}
+
+fnames = rownames(gsefiles)
+fnames # We check the number of file names of the gsefile we have got.
+
+# There is only one supplemental file, the code in Lecture 3 reads txt file, 
+# After undesirable outcome observed, we notice that it is an csv file. 
+# Thus we change it to read.csv(). Then we add the colname for the first column
+covid19 = read.csv(fnames[1],header=TRUE, check.names = FALSE)
+colnames(covid19)[1] <- "entrez_id"
+
+head(covid19)
+```
+```{r data cleaning ommit, results = 'hide'}
+# The Result is too long and is not important, thus I choose to hide the result. 
+gse <- getGEO("GSE152641",GSEMatrix=FALSE)
+```
+
+```{r data cleaning 2}
+# We explore our data set. 
+current_gpl <- names(GPLList(gse))[1]
+current_gpl_info <- Meta(getGEO(current_gpl))
+kable(covid19[1:15,1:5], format = "html")
+dim(covid19)
+colnames(covid19)
+```
+The colnames() show us that there are 86 observations, which is consistent with what the paper stated that they examined the RNAseq for 62 COVID-19 patients and 24 healthy controls. \newline \newline
+
+## Change some Column Name 
+Then we noticed that all tested sample are labelled as IMX_xxxxxxx, we need to classify them by healthy or covid for further use. On link: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641, there is a platform called Samples (86), and we check each code beneath it one by one to see if they are Healthy control_whole blood or COVID19_whole blood. And we could find that IMX_sample00001-IMX_sample00018 and IMX_sample00081-IMX_sample00086 are Healthy control_whole blood, while IMX_sample00019-IMX_sample00080 are COVID19_whole blood. \newline
+
+We find the ways to replicate a single value in link: https://www.tutorialspoint.com/how-to-create-a-data-frame-with-a-column-having-repeated-values-in-r
+```{r Identify Healthy & Covid}
+# We would rename the relavant column base on what we have found out. 
+new_name <- c("Healthy Control_0001", "Healthy Control_0002", "Healthy Control_0003", "Healthy Control_0004", "Healthy Control_0005", "Healthy Control_0006", "Healthy Control_0007", "Healthy Control_0008", "Healthy Control_0009", "Healthy Control_0010", "Healthy Control_0011" , "Healthy Control_0012", "Healthy Control_0013", "Healthy Control_0014", "Healthy Control_0015", "Healthy Control_0016", "Healthy Control_0017", "Healthy Control_0018", "COVID-19_0019", "COVID-19_0020", "COVID-19_0021", "COVID-19_0022", "COVID-19_0023", "COVID-19_0024", "COVID-19_0025", "COVID-19_0026", "COVID-19_0027", "COVID-19_0028", "COVID-19_0029", "COVID-19_0030", "COVID-19_0031", "COVID-19_0032", "COVID-19_0033", "COVID-19_0034", "COVID-19_0035", "COVID-19_0036", "COVID-19_0037", "COVID-19_0038", "COVID-19_0039", "COVID-19_0040", "COVID-19_0041", "COVID-19_0042", "COVID-19_0043", "COVID-19_0044", "COVID-19_0045", "COVID-19_0046", "COVID-19_0047", "COVID-19_0048", "COVID-19_0049", "COVID-19_0050", "COVID-19_0051", "COVID-19_0052", "COVID-19_0053", "COVID-19_0054", "COVID-19_0055", "COVID-19_0056", "COVID-19_0057", "COVID-19_0058", "COVID-19_0059", "COVID-19_0060", "COVID-19_0061", "COVID-19_0062", "COVID-19_0063", "COVID-19_0064", "COVID-19_0065", "COVID-19_0066", "COVID-19_0067", "COVID-19_0068", "COVID-19_0069", "COVID-19_0070", "COVID-19_0071", "COVID-19_0072", "COVID-19_0073", "COVID-19_0074", "COVID-19_0075", "COVID-19_0076", "COVID-19_0077", "COVID-19_0078", "COVID-19_0079", "COVID-19_0080", "Healthy Control_0081", "Healthy Control_0082", "Healthy Control_0083", "Healthy Control_0084", "Healthy Control_0085", "Healthy Control_0086")
+names(covid19)[2:87] <- new_name
+```
+
+According to the section in the research paper, it stated that: "Ensembl transcript IDs mapping to Entrez gene IDs in order to compare them with other viral data assayed by microarrays". Thus we could guess that the first column is the Entrez gene IDs. The thing we need to do is try to change it back to Ensembl transcript IDs or corresponding gene name. \newline
+
+I searched online and was lucky to find this website that helped me: https://www.biostars.org/p/441386/ and https://www.biostars.org/p/69647/; the error: keys must be supplied in a character vector with no NAs keeps on popping up, so I thought that changing the numerical data into character vector would help, and this link taught me how to do this: https://www.geeksforgeeks.org/convert-a-numeric-object-to-character-in-r-programming-as-character-function/ \newline
+
+## Map to gene name
+I added a as.vector() function to ensure that it returns a char vector as needed. By comparing the link's recommendation and my solution, they yields the same result. Thus I can use either.
+```{r data cleaning 3}
+# We compute the gene name based on their entrez_id. 
+gene_n1 <- getSYMBOL(as.vector(as.character(covid19$entrez_id)), data='org.Hs.eg')
+gene_n <- getSYMBOL(as.character(covid19$entrez_id), data='org.Hs.eg')
+setdiff(gene_n,gene_n1)
+sum(is.na(gene_n))
+```
+
+Then we want to bind the two data set  \newline
+The following link: https://stackoverflow.com/questions/35830532/merge-cbind-how-to-merge-better and https://www.geeksforgeeks.org/how-to-merge-two-dataframes-in-r/ suggested how to bind efficiently and correctly. \newline
+I choose cbind() in this case.
+```{r cleaning data 4}
+# We bind the gene name with the existing data set. 
+covid19 <- cbind(covid19, gene_n)
+# We rename the last column. 
+colnames(covid19)[88] = "gene_name"
+
+
+# The follow is the trick learnt this semester while doing the practice test.
+# We output the gene_name that is NA. 
+covid19[is.na(covid19$gene_name), ]$entrez_id
+```
+
+The NA values were checked on NCBI, and relative info was documented on https://github.com/bcb420-2022/Xinyi_Xu/wiki/7.--Processing-Data. Where 15 of them were replaced by another gene id, and the rest was removed from the data base. I would only take in account the replaced ones and remove the ones that have been deleted from the data base. I have ran getSYMBOL(as.vector(as.character(some id))) for each replaced entrez_id, and got their gene_name and plug them into the data set.
+
+```{r cleaning data 5}
+# We replace the NA value with the correspounding gene name if they were 
+# claimed to be replaced by another gene id. 
+covid19$gene_name[covid19$entrez_id == 23285] <- "BTBD8"
+covid19$gene_name[covid19$entrez_id == 84953] <- "MICAL2"
+covid19$gene_name[covid19$entrez_id == 286223] <- "S1PR3"
+covid19$gene_name[covid19$entrez_id == 338809] <- "PLEKHG7"
+covid19$gene_name[covid19$entrez_id == 388289] <- "ZFHX3" 
+covid19$gene_name[covid19$entrez_id == 388813] <- "SAMSN1" 
+covid19$gene_name[covid19$entrez_id == 392490] <- "NHSL2" 
+covid19$gene_name[covid19$entrez_id == 723788] <- "BCAR3" 
+covid19$gene_name[covid19$entrez_id == 101929738] <- "LOC102725072"
+covid19$gene_name[covid19$entrez_id == 102724957] <- "LINC02751" 
+covid19$gene_name[covid19$entrez_id == 102724993] <- "NPIPA2"
+covid19$gene_name[covid19$entrez_id == 107983991] <- "NFILZ" 
+covid19$gene_name[covid19$entrez_id == 107984125] <- "RP1" 
+covid19$gene_name[covid19$entrez_id == 107984138] <- "SMG1P7" 
+covid19$gene_name[covid19$entrez_id == 107986084] <- "USP4"
+```
+
+Then we would try to remove all remaining gene_name that is NA, which is they have been removed from NCBI data base. I fetched online and found the link: https://www.datasciencemadesimple.com/delete-or-drop-rows-in-r-with-conditions-2/ which suggested the ways to remove NA values. \newline
+
+First we need to check if there are other lines of NA values that present in the data set covid19, and make sure that we do not accidentally remove columns that we want to keep.
+```{r cleaning data 6}
+# Check how many NA values exist in data set covid19.
+summary(is.na(covid19))
+```
+
+From the above output, we could see that only the gene_name column present 6 NA values which we intended to remove, all other columns do not have NA values.
+```{r cleaning data 7}
+# So we could safely remove the NA values that we do not want.
+covid19 <- na.omit(covid19)
+```
+
+## Check Duplication & Filter Data
+```{r check duplication}
+# We check for duplication, codes were adapted from Lecture 4 slides.
+summarized_gene_counts <- sort(table(covid19$gene_name), decreasing = TRUE)
+summarized_gene_counts[which(summarized_gene_counts > 1)]
+```
+
+According to Lecture 4, "In edgeR, it is recommended to remove features without at least 1 read per million in n of the samples, where n is the size of the smallest group of replicates."
+The sample size of our group is 62 and 24 respectively, so it would be better for us to use $n = 24$ in this case.
+```{r Filter}
+# The following codes are adapted from lecture 4 slides. 
+# Translate out counts into counts per million using the edgeR package
+count_pm = cpm(covid19[,2:87])
+rownames(count_pm) <- covid19[,1]
+# Get rid of low counts
+keep = rowSums(count_pm > 1) >= 24
+covid19_filtered = covid19[keep,] # Now there are only 14424 obs left. 
+
+# We check for duplicates again
+summarized_gene_counts1 <- sort(table(covid19_filtered$gene_name), decreasing = TRUE)
+summarized_gene_counts1[which(summarized_gene_counts1 > 1)]
+```
+Very unfortunately, we found the duplicates again in the filtered data set. We checked in covid19_filtered and noticed that the values for duplicate in BCAR3 is the same. We would perform a check on other gene names as well. The comparing idea came from link: https://stackoverflow.com/questions/10592148/compare-if-two-dataframe-objects-in-r-are-equal
+```{r Filter1, echo=FALSE}
+# "BCAR3"
+# which(covid19_filtered$gene_name == "BCAR3")
+a <- data.frame(covid19_filtered[c(4170, 14056), ])
+a1 <- a[which(a$entrez_id == 8412), ]
+a2 <- a[which(a$entrez_id == 723788), ]
+all(a1[2:87] == a2[2:87])
+
+# "BTBD8"
+# which(covid19_filtered$gene_name == "BTBD8")
+a <- data.frame(covid19_filtered[c(6471, 13318), ])
+a1 <- a[which(a$entrez_id == 23285), ]
+a2 <- a[which(a$entrez_id == 284697), ]
+all(a1[2:87] == a2[2:87])
+
+# "LINC02751" The only one that is not identical. 
+# which(covid19_filtered$gene_name == "LINC02751")
+a <- data.frame(covid19_filtered[c(14327, 14365), ])
+a1 <- a[which(a$entrez_id == 102724957), ]
+a2 <- a[which(a$entrez_id == 105376569), ]
+all(a1[2:87] == a2[2:87])
+
+# "MICAL2"
+# which(covid19_filtered$gene_name == "MICAL2")
+a <- data.frame(covid19_filtered[c(4930, 11084), ])
+a1 <- a[which(a$entrez_id == 9645), ]
+a2 <- a[which(a$entrez_id == 84953), ]
+all(a1[2:87] == a2[2:87])
+
+# "NFILZ"
+# which(covid19_filtered$gene_name == "NFILZ")
+a <- data.frame(covid19_filtered[c(14348, 14378), ])
+a1 <- a[which(a$entrez_id == 105372267), ]
+a2 <- a[which(a$entrez_id == 107983991), ]
+all(a1[2:87] == a2[2:87])
+
+# "NHSL2"
+# which(covid19_filtered$gene_name == "NHSL2")
+a <- data.frame(covid19_filtered[c(13491, 13781), ])
+a1 <- a[which(a$entrez_id == 340527), ]
+a2 <- a[which(a$entrez_id == 392490), ]
+all(a1[2:87] == a2[2:87])
+
+# "PLEKHG7"
+# which(covid19_filtered$gene_name == "PLEKHG7")
+a <- data.frame(covid19_filtered[c(13438, 13888), ])
+a1 <- a[which(a$entrez_id == 338809), ]
+a2 <- a[which(a$entrez_id == 440107), ]
+all(a1[2:87] == a2[2:87])
+
+# "RP1"
+# which(covid19_filtered$gene_name == "RP1")
+a <- data.frame(covid19_filtered[c(3046, 14380), ])
+a1 <- a[which(a$entrez_id == 6101), ]
+a2 <- a[which(a$entrez_id == 107984125), ]
+all(a1[2:87] == a2[2:87])
+
+# "S1PR3"
+# which(covid19_filtered$gene_name == "S1PR3")
+a <- data.frame(covid19_filtered[c(993, 13404), ])
+a1 <- a[which(a$entrez_id == 1903), ]
+a2 <- a[which(a$entrez_id == 286223), ]
+all(a1[2:87] == a2[2:87])
+
+# "SAMSN1"
+# which(covid19_filtered$gene_name == "SAMSN1")
+a <- data.frame(covid19_filtered[c(9578, 13733), ])
+a1 <- a[which(a$entrez_id == 64092), ]
+a2 <- a[which(a$entrez_id == 388813), ]
+all(a1[2:87] == a2[2:87])
+
+# "USP4"
+# which(covid19_filtered$gene_name == "USP4")
+a <- data.frame(covid19_filtered[c(3765, 14391), ])
+a1 <- a[which(a$entrez_id == 7375), ]
+a2 <- a[which(a$entrez_id == 107986084), ]
+all(a1[2:87] == a2[2:87])
+
+# "ZFHX3"
+# which(covid19_filtered$gene_name == "ZFHX3")
+a <- data.frame(covid19_filtered[c(230, 13700), ])
+a1 <- a[which(a$entrez_id == 463), ]
+a2 <- a[which(a$entrez_id == 388289), ]
+all(a1[2:87] == a2[2:87])
+```
+From the output, we could witness that only duplicates in LINC02751 is not identical. Thus, it would nice for us to keep only LINC02751, while remove one version from all other gene names. 
+
+Because we want to keep LINC02751 and the number of duplicated gene names are not very large, we could do it by hand. 
+
+The following link could give us a guide: https://stackoverflow.com/questions/12328056/how-do-i-delete-rows-in-a-data-frame
+```{r Filter2}
+# We filter the duplicated rows as we checked above
+covid19_filtered1 <- covid19_filtered[-c(4170, 6471, 4930, 14348, 13491, 13438, 3046, 993, 9578, 3765, 230),,drop=F]
+
+# We check again the filtered data set. It shows as we expected. With 14413 observations. 
+summarized_gene_counts1 <- sort(table(covid19_filtered1$gene_name), decreasing = TRUE)
+summarized_gene_counts1[which(summarized_gene_counts1 > 1)]
+```
+We could notice that the above one of the gene was the one we added by hand in previous section, but NCBI has stated that: This record was replaced with Gene ID: 105376569. So there might be something that changed. I believe it would better for us to keep this gene for now. 102724957 used to be defined as protein encoding, while 105376569 is ncRNA, the reason why 102724957 was replaced may due to it was stated as uncharacterized LOC102724957, new discovery may change our understanding for it. \newline
+
+At this point, the total observation is 14413, which is between the interval of 10,000-15,000, the coverage of the data set is decent. 
+
+
+# Apply Normalization
+
+## Boxplot
+Note that there is warning for all 86 samples: Warning in bplt(at[i], wid = width[i], stats = z$stats[, i], out = z$out[z$group ==  : Outlier (-Inf) in boxplot 1 is not drawn. \newline
+
+The median line is denoted by the wine red line.
+```{r Boxplot, warning=FALSE}
+# All codes below are adapted from lecture 4 with slight modification. 
+# We construct the box plot
+covidplot1 <- log2(cpm(covid19_filtered1[2 : 87]))
+# I noticed that the xlabel start overlapping with the sample name, so 
+# I fetched online and changed it. The helper link is the following:
+# https://stackoverflow.com/questions/30265728/in-r-base-plot-move-axis-label-closer-to-axis
+boxplot(covidplot1, ylab = "log2 CPM", 
+        las = 2, cex = 0.5, cex.lab = 0.5,
+        cex.axis = 0.5, main = "Fig1. Healthy and Covid19 RNASeq Samples",
+        col.axis="#2e8b57", col.ticks="#2e8b57",)
+title(xlab="Samples", line=3.65, cex.lab=0.75)
+
+# Draw the median on each box plot and add customized color. 
+abline(h = median(apply(covidplot1, 2, median)), col = "#b11226", lwd = 0.8, lty = "dashed")
+```
+
+## Density plot
+```{r Density plot}
+# All codes below are adapted from lecture 4 with slight modification. 
+# Create density count.
+density_count <- apply(log2(cpm(covid19_filtered1[,2:87])), 2, density)
+
+# Calculate the limits across all the samples
+xlim <- 0; ylim <- 0
+for (i in 1:length(density_count)) {
+  xlim <- range(c(xlim, density_count[[i]]$x)); 
+  ylim <- range(c(ylim, density_count[[i]]$y))
+}
+
+# Create col and lty. 
+cols <- rainbow(length(density_count))
+ltys <- rep(1, length(density_count))
+
+# Plot the first density plot to initialize the plot
+plot(density_count[[1]], xlim=xlim, ylim=ylim, type="n", 
+     ylab="Smoothing density of log2-CPM", main="Fig2. Density Curve", cex.lab = 0.8)
+
+# Plot each line
+for (i in 1:length(density_count)) 
+  lines(density_count[[i]], col=cols[i])
+
+        
+# Create legend, the number of observations are too many, thus the cex is modify
+# to be very small. 
+legend("topright", colnames(covidplot1), 
+       col=cols, lty=ltys, cex=0.18, 
+       border ="#A7E7E0", text.col = "#185851", 
+       merge = TRUE, bg = "#2e8b57")
+```
+Before normalization, we could see form Fig1, that the median of each sample varied a bit from the median line, there are samples like 31 and 61 shown in Fig1 that floats visibly away from the median line. And in Fig2, we could see a bit noise on the lefter side on the graph, some density line has a local maxim at around 1.5-2.5. We would need to normalize the data for further use. 
+
+## Trimmed Mean of M-values (TMM)
+As stated in supplement material \textbf{A scaling normalization method for differential expression analysis of RNA-seq data}: "the TMM normalization is a simple and effective method for estimating relative RNA production levels from RNA-seq data." and "TMM factor is robust for lower coverage data where more genes with zero counts", so I believe it would be a good idea to use TMM normalization as we might encounter prblem like "genes with zero counts" for this data set. 
+
+We first want to construct a group variable that track which group the sample belongs to. Luckily, I have checked the sample in the first place, stripping the modified sample name would be a bit annoying, and as there are replications that offers shortcut, I prefer hand coding it. 
+```{r Group construction}
+# The construction of the group set imitated the following link: https://www.tutorialspoint.com/how-to-create-a-data-frame-with-a-column-having-repeated-values-in-r
+gn <- rep("Healthy" ,times=18)
+gn1 <- rep("Covid19" ,times=62)
+gn <- append(gn, gn1)
+gn1 <- rep("Healthy" ,times=6)
+gn <- append(gn, gn1)
+covid_group <- data.frame(gn)
+colnames(covid_group) = "Group"
+rownames(covid_group) = colnames(covid19_filtered1[2:87])
+```
+
+
+After creating our data set which keep track of our sample group, we could then safely proceed into our process of applying TMM. 
+```{r TMM, warning=FALSE}
+# The following code is adapted from Lecture 4 slides with slight modification. 
+filtered_matrix <- as.matrix(covid19_filtered1[, 2:87])
+rownames(filtered_matrix) <- covid19_filtered1$gene_name
+
+
+d = DGEList(counts = filtered_matrix, group = covid_group$Group)
+d = calcNormFactors(d) 
+
+#get the normalized data
+normalized_counts <- cpm(d)
+
+
+
+covidplot1_n <- log2(normalized_counts)
+boxplot(covidplot1_n, ylab = "log2 CPM", 
+        las = 2, cex = 0.5, cex.lab = 0.5,
+        cex.axis = 0.5, main = "Fig3. Healthy and Covid19 RNASeq Samples after Nomalization", 
+        col.axis="#2e8b57", col.ticks="#2e8b57")
+title(xlab="Samples", line=3.65, cex.lab=0.75)
+
+# Draw the median on each box plot and add customized color. 
+abline(h = median(apply(covidplot1_n, 2, median)), col = "#b11226", lwd = 0.8, lty = "dashed")
+```
+```{r Compairson, echo=FALSE, warning=FALSE}
+boxplot(covidplot1, ylab = "log2 CPM", 
+        las = 2, cex = 0.5, cex.lab = 0.5,
+        cex.axis = 0.5, main = "Fig4. Healthy and Covid19 RNASeq Samples before Normalization",
+        col.axis="#2e8b57", col.ticks="#2e8b57")
+title(xlab="Samples", line=3.65, cex.lab=0.75)
+
+# Draw the median on each box plot and add customized color. 
+abline(h = median(apply(covidplot1, 2, median)), col = "#b11226", lwd = 0.8, lty = "dashed")
+```
+From the above two graphs, we could clearly witness that after normalization, all medians for each sample lies much closer towards the median line. The variation has been reduced. 
+
+## Density plot
+```{r Normalized density plot}
+# All codes below are adapted from lecture 4 with slight modification. 
+# Create density count.
+density_normal <- apply(covidplot1_n, 2, density)
+
+# Calculate the limits across all the samples
+xlim <- 0; ylim <- 0
+for (i in 1:length(density_normal)) {
+  xlim <- range(c(xlim, density_normal[[i]]$x)); 
+  ylim <- range(c(ylim, density_normal[[i]]$y))
+}
+
+# Create col and lty. 
+cols <- rainbow(length(density_normal))
+ltys <- rep(1, length(density_normal))
+
+# Plot the first density plot to initialize the plot
+plot(density_normal[[1]], xlim=xlim, ylim=ylim, type="n", 
+     ylab="Smoothing density of log2-CPM", main="Fig5. Density Plot after Normalization", 
+     cex.lab = 0.8)
+
+# Plot each line
+for (i in 1:length(density_normal)) 
+  lines(density_normal[[i]], col=cols[i])
+
+        
+# Create legend, the number of observations are too many, thus the cex is modify
+# to be very small. 
+legend("topright", colnames(covidplot1_n), 
+       col=cols, lty=ltys, cex=0.18,
+       border ="#A7E7E0", text.col = "#185851", 
+       merge = TRUE, bg = "#2e8b57")
+```
+
+```{r Density plot before Normalization, echo=FALSE}
+# All codes below are adapted from lecture 4 with slight modification. 
+# Create density count.
+density_count <- apply(log2(cpm(covid19_filtered1[,2:87])), 2, density)
+
+# Calculate the limits across all the samples
+xlim <- 0; ylim <- 0
+for (i in 1:length(density_count)) {
+  xlim <- range(c(xlim, density_count[[i]]$x)); 
+  ylim <- range(c(ylim, density_count[[i]]$y))
+}
+
+# Create col and lty. 
+cols <- rainbow(length(density_count))
+ltys <- rep(1, length(density_count))
+
+# Plot the first density plot to initialize the plot
+plot(density_count[[1]], xlim=xlim, ylim=ylim, type="n", 
+     ylab="Smoothing density of log2-CPM", main="Fig6. Density Curve before Normalization", 
+     cex.lab = 0.8)
+
+# Plot each line
+for (i in 1:length(density_count)) 
+  lines(density_count[[i]], col=cols[i])
+
+        
+# Create legend, the number of observations are too many, thus the cex is modify
+# to be very small. 
+legend("topright", colnames(covidplot1), 
+       col=cols, lty=ltys, cex=0.18, 
+       border ="#A7E7E0", text.col = "#185851", 
+       merge = TRUE, bg = "#2e8b57")
+```
+
+By observing the above two curves, we could witness that the noise on the lefter side of the graph is largely reduced and the whole graph gather towards the peak, which we could conslude that the variance has decreased. 
+
+```{r MDS plot}
+plotMDS(d, labels=rownames(covid_group),
+        col = c("#006994","#9b1c31")[factor(covid_group$Group)], 
+        main = "Fig7. Distances between Samples")
+```
+For Fig7. this is something we would like to see. We could witness a separation line around Leading logFC dim 1 = -0.5. Though there are a slight number of Covid19 samples that overlap with the cluster of Healthy Samples, the two groups show a visible difference as from the graph, Healthy Samples usually have Leading logFC dim 1 < -0, while most of the Covid19 sample have Leading logFC dim 1 > 0. \newline
+
+And as the purpose of our research design is to check the transcriptomic similarities and differences for Covid19 group and healthy group. Clear difference between these two groups is something we are surely interested in. 
+
+
+## Dispersion
+Then we would check the estimate common and tagwise dispersion.
+ 
+```{r Dispersion}
+# The following code is adapted from Lecture 5 with slight modification. 
+# We first set up a model. 
+model_design <- model.matrix(~covid_group$Group)
+d <- estimateDisp(d, model_design) 
+
+# We plot the dispersion-squared
+plotBCV(d,col.tagwise = "#a1e3d8",col.common = "#006994",col.trend = "#9b1c31", 
+        main = "Fig8. Dispersion-squared plot")
+
+# We create a visual representation of the mean-variance relationship
+plotMeanVar(d, show.raw.vars = TRUE, show.tagwise.vars=TRUE, 
+            show.ave.raw.vars = TRUE, 
+            NBline=TRUE,
+            show.binned.common.disp.vars = TRUE, 
+            main = "Fig.9 Mean-variance Relationship")
+```
+
+From Fig8. we could witness a general trend: as gene expression increases, the dispersion value shows a less variation. However, there is a slight increase in the right half of the Fig8, indicates that for some genes, as expression increases, there is slight increase in variation. The BCV is around 0.2-0.3 as shown by the blue line in Fig8. The Fig9. shows a consistent result as Fig8.  \newline \newline
+
+So in conclusion, after normalization, we could clearly witness a decrease in variation from Fig3, and 5, and Fig7. suggests that the two groups that we want to investigate does have a difference. Thus the normalization with TMM does make a difference and would be helpful while do further analysis. \newline
+
+# Identifier mapping
+
+```{r Identifier mapping construct}
+# We construct a data set based on the previous data set we have normalized. 
+normalized_counts_enid <- data.frame(normalized_counts)
+normalized_counts_enid <- cbind(normalized_counts_enid, covid19_filtered1$gene_name)
+normalized_counts_enid <- cbind(normalized_counts_enid, covid19_filtered1$entrez_id)
+colnames(normalized_counts_enid)[87] = "Gene_name"
+colnames(normalized_counts_enid)[88] = "entrezgene_id"
+rownames(normalized_counts_enid) = covid19_filtered1$entrez_id
+```
+
+```{r Identifier mapping}
+# The following code is adapted from Lecture 5 with slight modification. 
+# We create the starter material we need for 
+ensembl <- useMart("ensembl")
+ensembl = useDataset("hsapiens_gene_ensembl",mart=ensembl)
+datasets <- listDatasets(ensembl) 
+biomart_human_filters <- listFilters(ensembl)
+dim(listFilters(ensembl))
+
+# The data set only offers entrezgene_id, mapping it back to ensembl_gene_id
+# may help.
+# The code imitated: https://www.biostars.org/p/398563/
+filters = listFilters(ensembl)
+ensembl_gene_id <- getBM(filters="entrezgene_id", attributes=c("ensembl_gene_id","entrezgene_id"),
+                         values=covid19_filtered1$entrez_id, mart=ensembl)
+```
+By observing the ensembl_gene_id data, we very unfortunately found that 1 entrezgene_id could be mapped to several entrezgene_id, like 1022 could be mapped to ENSG00000277273 and ENSG00000134058. There are a total 16305 observations for ensembl_gene_id, removing around 2000 replications would be a tough work. We should try to find another way.
+```{r a}
+# We create a container to hold all values.
+conversion_stash <- "covid_conversion.rds"
+if(file.exists(conversion_stash)){
+  covid_conversion <- readRDS(conversion_stash)
+} else {
+  covid_conversion <- getBM(attributes = c("entrezgene_id", "hgnc_symbol"),
+                               filters = c("entrezgene_id"), 
+                               values = covid19_filtered1$entrez_id,
+                               mart = ensembl)
+  saveRDS(covid_conversion, conversion_stash)
+}
+
+# Return the unmapped number of genes
+nrow(normalized_counts) - length(which(rownames(normalized_counts_enid) %in% covid_conversion$entrezgene_id))
+
+# We skim the data.
+normalized_counts_annot <- merge(covid_conversion, normalized_counts_enid, by = "entrezgene_id", all.y=TRUE)
+
+# Check if the number of unmapped genes are the same after we merge the date
+entrezgene_id_missing_gene <- normalized_counts_annot$entrezgene_id[
+  which(is.na(normalized_counts_annot$hgnc_symbol))]
+length(entrezgene_id_missing_gene)
+
+# We reorder the original data, and check the info of the unmapped gene.
+# Luckily, we have already computed the gene name in advance
+entrezgene_id_missing_gene1 <- data.frame(entrezgene_id_missing_gene)
+colnames(entrezgene_id_missing_gene1) = "entrez_id"
+
+# Create a reordered data set who contain the original data.
+reorder <- data.frame(c(covid19[1], covid19[88], covid19[2:87]))
+old_mapping <- merge(reorder[, 1:2], entrezgene_id_missing_gene1, by = "entrez_id", all.y=TRUE)
+
+# By observing old_mapping, we could notice that there are lots of gene that start
+# with LOC. 
+kable(old_mapping[grep(old_mapping$gene_name,pattern = "^LOC")[1:13],], type="html")
+```
+
+The total number of unmapped genes are 52, which is less than 0.4% of the total observations of the our filtered data set. And we noticed that 13(25%) of them are genes that start with LOC, which on NCBI, they are usually "uncharacterized" gene. So this may not affect our analysis, given that the number missing is not very large. We would keep those because they are all being able to get mapped to gene name when we did our gene name transformation in previous section. 
+
+```{r Transfer old data}
+# The following codes are adapted from lecture 5 slide with slight modification
+missing_ids_subset <- normalized_counts_annot[which(is.na(normalized_counts_annot$hgnc_symbol)),]
+
+# Merge the missing ids subset with old ids
+colnames(old_mapping)[1] = "entrezgene_id"
+# We merge the missing data with our mapped data. 
+missing_ids_subset_withids <- merge(old_mapping, missing_ids_subset, by = "entrezgene_id", all.y=TRUE)
+missing_ids_subset_withids <- missing_ids_subset_withids[,-3]
+colnames(missing_ids_subset_withids)[1:2] <- colnames(normalized_counts_annot)[1:2]
+finalized_normalized_counts <- rbind(normalized_counts_annot[
+  which(!is.na(normalized_counts_annot$hgnc_symbol)),], missing_ids_subset_withids)
+```
+
+
+## Check for Duplication again
+We could notice from normalized_counts_annot data set that it contains 14475 observations, which is weird, as the original filtered dataset only contain 14413 observations, so I decided to check for duplication again to see if something has went wrong. 
+```{r dup checking}
+duplications <- sort(table(normalized_counts_annot$entrezgene_id), decreasing = TRUE)
+duplications[which(duplications > 1)]
+```
+
+There are 62 duplicated entrezgene_id which is unexpected, we would check it. I noticed that at least 640, 883 has the same duplicated info, but one has mapped hgnc symbol, one doesnot. probabily it there was a problem during merging. We would check and remove one by one. 
+```{r remove dup}
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 640), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 883), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 932), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 1124), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 1139), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 1508), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 2222), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 3117), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 3802), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 3809), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 3812), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 5554), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 6349), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 6606), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 8195), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 8490), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 8622), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 8878), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 8916), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 9228), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 9437), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 9782), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 10261), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 10395), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 11046), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 11068), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 23429), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 23596), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 26121), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 26240), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 29994), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 51206), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 51326), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 54471), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 54816), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 57604), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 90378), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 147798), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 152877), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 202134), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 221178), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 259291), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 284391), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 346528), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 378108), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 401427), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 402317), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 414062), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 414243), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 440519), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 647042), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 653125), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 728047), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 728340), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 729873), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 100037417), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 100132247), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 100507463), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 100528062), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 100529261), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 107987373), ]
+
+dup1 <- normalized_counts_annot[which(normalized_counts_annot$entrezgene_id == 113523636), ]
+
+# We safely remove the duplicated ones as they carry same info. 
+normalized_counts_annot <- normalized_counts_annot[-c(318, 463, 498, 617, 623, 805, 1181, 1566, 1859, 1863, 1866, 2735, 3205, 3349, 4085, 4222, 4306, 4478, 4510, 4676, 4805, 5060, 5427, 5509, 5945, 5960, 6598, 6701, 6990, 7036, 7445, 7670, 7754, 8077, 8204, 9338, 11271, 12354, 12507, 12897, 12995, 13192, 13335, 13582, 13697, 13868, 13882, 13910, 13913, 13944, 14060, 14070, 14105, 14110, 14145, 14163, 14214, 14291, 14303, 14306, 14446, 14474),,drop=F]
+
+# We check for duplication again
+duplications <- sort(table(normalized_counts_annot$entrezgene_id), decreasing = TRUE)
+duplications[which(duplications > 1)]
+```
+Now the duplication for entrezgene_id has been removed and the observation number for normalized_counts_annot is again 14413, which is the same as Covid19_filtered1.
+
+```{r hgnc dup}
+duplications1 <- sort(table(normalized_counts_annot$hgnc_symbol), decreasing = TRUE)
+duplications1[which(duplications1 > 1)]
+```
+There are replications for hgnc_symbol which may be resulted as several entrezgene_id mapped towards the same hgnc_symbol. We can not remove them here. \newline
+
+We use write.csv() to output our processed data. 
+
+
+# Interpret, and document
+
+## What are the control and test conditions of the dataset?
+
+The control condition is the adult healthy individuals who carry healthy control_whole blood, their blood was collected through a commercial vendor. They are all "negative for HIV, West Nile, Hepatitis B, and Hepatitis C by molecular or antibody based testing."\newline
+
+The test condition is adult patients with SARS-CoV-2 pneumonia who donates COVID19_whole blood, the patients were enrolled within the first 24 hours of hospital admission. \newline
+
+## Why is the dataset of interest to you?
+
+Covid19 is a very hot topic, and it is a real challenge to invent vaccine, during my intern in summer, I did a little bit of research on it. And recently, I read a paper claiming that human anatomy shows that Covid19 virus may continue to live in the patient's body for months even they seemed to be cured. I was shocked by the info this paper has given me. \newline
+
+As many symptoms of Covid19 is visible, and I feel that it would be quite interesting to look into the micro world to see if Covid19 would change the DNA replication or RNA sequence of infected individuals. And this data set shows the gene expression difference between healthy individuals and infected one, which would give me an insight and a chance to investigate what might be going on in human body after infected by the virus. 
+
+## Were there expression values that were not unique for specific genes? How did you handle these?
+
+There were no genes that duplicates for our normalized--filter--mapped data(normalized_counts_annot), we have previous manually removed all duplicates, and all remaining rows either are not duplicated, or they contain values that are different. 
+
+## Were there expression values that could not be mapped to current HUGO symbols?
+
+Yes, there were expression that could not be mapped to current HUGO symbols. For the original data, as we have discussed before, some of the gene id has been removed from NCBI data base, and when we were trying to map in the final section for our normalized data, there were some that are not mapped, but they were handled by assigning gene name to them in the first place. And 25% of the unmapped expression values are LOC gene which is classified as uncharacterized in NCBI. For now I would leave the HUGO symbols for those expression values blank.
+
+## How many outliers were removed?
+
+After filtering, our observation number decrease from 20454 to 14424, so the total outliers remove were 6030. 
+
+## How did you handle replicates?
+
+The replications were either checked and compared manually, or we use setdiff() function to check if the rows carry exactly the same info. If they do, we would remove them, if they do not, we keep them in our data set so that we do not accidentally loss information. 
+
+## What is the final coverage of your dataset?
+
+The final coverage of my dataset is 14413, which as prof has clarified the final coverage of the dataset is "number of genes whose expression is being monitored", and there are in total 14413 observations where each observation represents a single gene. Thus the final coverage should be 14413.
+
+# Reference 
+
+1. R programming for data science: https://bookdown.org/rdpeng/rprogdatascience/data-analysis-case-study-changes-in-fine-particle-air-pollution-in-the-u-s-.html
+
+2. Lecture modules: https://q.utoronto.ca/courses/248455/modules
+
+3. Transcriptomic similarities and differences in host response between SARS-CoV-2 and other viral infections: https://www.ncbi.nlm.nih.gov/pubmed/33437935
+
+4. All other specific references has been documented as comments in codes. 
