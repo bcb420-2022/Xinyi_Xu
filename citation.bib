@@ -1,0 +1,188 @@
+@article{GSE152641,
+title = {Transcriptomic similarities and differences in host response between SARS-CoV-2 and other viral infections},
+journal = {iScience},
+volume = {24},
+number = {1},
+pages = {101947},
+year = {2021},
+issn = {2589-0042},
+doi = {https://doi.org/10.1016/j.isci.2020.101947},
+url = {https://www.sciencedirect.com/science/article/pii/S2589004220311445},
+author = {Simone A. Thair and Yudong D. He and Yehudit Hasin-Brumshtein and Suraj Sakaram and Rushika Pandya and Jiaying Toh and David Rawling and Melissa Remmel and Sabrina Coyle and George N. Dalekos and Ioannis Koutsodimitropoulos and Glykeria Vlachogianni and Eleni Gkeka and Eleni Karakike and Georgia Damoraki and Nikolaos Antonakos and Purvesh Khatri and Evangelos J. Giamarellos-Bourboulis and Timothy E. Sweeney},
+keywords = {Molecular Biology, Immunology: Bioinformatics, Transcriptomics},
+abstract = {Summary
+The pandemic 2019 novel coronavirus disease (COVID-19) shares certain clinical characteristics with other acute viral infections. We studied the whole-blood transcriptomic host response to severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) using RNAseq from 24 healthy controls and 62 prospectively enrolled patients with COVID-19. We then compared these data to non-COVID-19 viral infections, curated from 23 independent studies profiling 1,855 blood samples covering six viruses (influenza, respiratory syncytial virus (RSV), human rhinovirus (HRV), severe acute respiratory syndrome coronavirus 1 (SARS-CoV-1), Ebola, dengue). We show gene expression changes in COVID-19 versus non-COVID-19 viral infections are highly correlated (r = 0.74, p < 0.001). However, we also found 416 genes specific to COVID-19. Inspection of top genes revealed dynamic immune evasion and counter host responses specific to COVID-19. Statistical deconvolution of cell proportions maps many cell type proportions concordantly shifting. Discordantly increased in COVID-19 were CD56bright natural killer cells and M2 macrophages. The concordant and discordant responses mapped out here provide a window to explore the pathophysiology of the host response to SARS-CoV-2.}
+}
+
+
+@Manual{BiocManager,
+    title = {BiocManager: Access the Bioconductor Project Package Repository},
+    author = {Martin Morgan},
+    year = {2021},
+    note = {R package version 1.30.16},
+    url = {https://CRAN.R-project.org/package=BiocManager},
+  }
+  
+  
+  @Article{GEOquery,
+    author = {Sean Davis and Paul Meltzer},
+    title = {GEOquery: a bridge between the Gene Expression Omnibus (GEO) and BioConductor},
+    journal = {Bioinformatics},
+    year = {2007},
+    volume = {14},
+    pages = {1846--1847},
+  }
+  
+  
+  @Article{biomaRt,
+    title = {BioMart and Bioconductor: a powerful link between biological databases and microarray data analysis},
+    author = {Steffen Durinck and Yves Moreau and Arek Kasprzyk and Sean Davis and Bart {De Moor} and Alvis Brazma and Wolfgang Huber},
+    journal = {Bioinformatics},
+    year = {2005},
+    volume = {21},
+    pages = {3439--3440},
+  }
+  
+  
+  @InCollection{knitr,
+    booktitle = {Implementing Reproducible Computational Research},
+    editor = {Victoria Stodden and Friedrich Leisch and Roger D. Peng},
+    title = {knitr: A Comprehensive Tool for Reproducible Research in {R}},
+    author = {Yihui Xie},
+    publisher = {Chapman and Hall/CRC},
+    year = {2014},
+    note = {ISBN 978-1466561595},
+    url = {http://www.crcpress.com/product/isbn/9781466561595},
+  }
+  
+  
+  @Manual{AnnotationDbi,
+    title = {AnnotationDbi: Manipulation of SQLite-based annotations in Bioconductor},
+    author = {Hervé Pagès and Marc Carlson and Seth Falcon and Nianhua Li},
+    year = {2020},
+    note = {R package version 1.52.0},
+    url = {https://bioconductor.org/packages/AnnotationDbi},
+  }
+  
+  
+  @Manual{annotate,
+    title = {annotate: Annotation for microarrays},
+    author = {R. Gentleman},
+    year = {2020},
+    note = {R package version 1.68.0},
+  }
+  
+  
+  @Article{edgeR1,
+    title = {edgeR: a Bioconductor package for differential expression analysis of digital gene expression data},
+    author = {Mark D Robinson and Davis J McCarthy and Gordon K Smyth},
+    journal = {Bioinformatics},
+    volume = {26},
+    number = {1},
+    pages = {139-140},
+    year = {2010},
+    doi = {10.1093/bioinformatics/btp616},
+  }
+
+
+  @Article{edgeR2,
+    author = {Davis J McCarthy and Yunshun Chen and Gordon K Smyth},
+    title = {Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation},
+    year = {2012},
+    journal = {Nucleic Acids Research},
+    volume = {40},
+    number = {10},
+    pages = {4288-4297},
+    doi = {10.1093/nar/gks042},
+  }
+  
+  
+  @article{Geo,
+    author = {Barrett, Tanya and Wilhite, Stephen E. and Ledoux, Pierre and Evangelista, Carlos and Kim, Irene F. and Tomashevsky, Maxim and Marshall, Kimberly A. and Phillippy, Katherine H. and Sherman, Patti M. and Holko, Michelle and Yefanov, Andrey and Lee, Hyeseung and Zhang, Naigong and Robertson, Cynthia L. and Serova, Nadezhda and Davis, Sean and Soboleva, Alexandra},
+    title = "{NCBI GEO: archive for functional genomics data sets—update}",
+    journal = {Nucleic Acids Research},
+    volume = {41},
+    number = {D1},
+    pages = {D991-D995},
+    year = {2012},
+    month = {11},
+    abstract = "{The Gene Expression Omnibus (GEO, http://www.ncbi.nlm.nih.gov/geo/) is an international public repository for high-throughput microarray and next-generation sequence functional genomic data sets submitted by the research community. The resource supports archiving of raw data, processed data and metadata which are indexed, cross-linked and searchable. All data are freely available for download in a variety of formats. GEO also provides several web-based tools and strategies to assist users to query, analyse and visualize data. This article reports current status and recent database developments, including the release of GEO2R, an R-based web application that helps users analyse GEO data.}",
+    issn = {0305-1048},
+    doi = {10.1093/nar/gks1193},
+    url = {https://doi.org/10.1093/nar/gks1193},
+    eprint = {https://academic.oup.com/nar/article-pdf/41/D1/D991/3678141/gks1193.pdf},
+}
+
+
+@Article{ComplexHeatmap,    title = {Complex heatmaps reveal patterns and correlations in multidimensional genomic data},    author = {Zuguang Gu and Roland Eils and Matthias Schlesner},    journal = {Bioinformatics},    year = {2016},  }
+
+
+@Article{circlize,    title = {circlize implements and enhances circular visualization in R},    author = {Zuguang Gu and Lei Gu and Roland Eils and Matthias Schlesner and Benedikt Brors},    journal = {Bioinformatics},    volume = {30},    issue = {19},    pages = {2811-2812},    year = {2014},  }
+
+
+@Article{limma,    author = {Matthew E Ritchie and Belinda Phipson and Di Wu and Yifang Hu and Charity W Law and Wei Shi and Gordon K Smyth},    title = {{limma} powers differential expression analyses for {RNA}-sequencing and microarray studies},    journal = {Nucleic Acids Research},    year = {2015},    volume = {43},    number = {7},    pages = {e47},    doi = {10.1093/nar/gkv007},  }
+
+
+@Article{tidyverse,    title = {Welcome to the {tidyverse}},    author = {Hadley Wickham and Mara Averick and Jennifer Bryan and Winston Chang and Lucy D'Agostino McGowan and Romain François and Garrett Grolemund and Alex Hayes and Lionel Henry and Jim Hester and Max Kuhn and Thomas Lin Pedersen and Evan Miller and Stephan Milton Bache and Kirill Müller and Jeroen Ooms and David Robinson and Dana Paige Seidel and Vitalie Spinu and Kohske Takahashi and Davis Vaughan and Claus Wilke and Kara Woo and Hiroaki Yutani},    year = {2019},    journal = {Journal of Open Source Software},    volume = {4},    number = {43},    pages = {1686},    doi = {10.21105/joss.01686},  }
+
+
+@Manual{stats,    title = {R: A Language and Environment for Statistical Computing},    author = {{R Core Team}},    organization = {R Foundation for Statistical Computing},    address = {Vienna, Austria},    year = {2020},    url = {https://www.R-project.org/},  }
+
+@Book{ggplot2,    author = {Hadley Wickham},    title = {ggplot2: Elegant Graphics for Data Analysis},    publisher = {Springer-Verlag New York},    year = {2016},    isbn = {978-3-319-24277-4},    url = {https://ggplot2.tidyverse.org},  }
+
+
+@Manual{EnhancedVolcano,    title = {EnhancedVolcano: Publication-ready volcano plots with enhanced colouring andlabeling},    author = {Kevin Blighe and Sharmila Rana and Myles Lewis},    year = {2020},    note = {R package version 1.8.0},    url = {https://github.com/kevinblighe/EnhancedVolcano},  }@Article{seqplots,    author = {Przemyslaw Stempor and Julie Ahringer},    title = {SeqPlots - Interactive software for exploratory data analyses, pattern discovery and visualization in genomics [version 1; referees: 2 approved, 1 approved with reservations]},    year = {2014},    journal = {Wellcome Open Research},    volume = {1},    number = {14},    doi = {10.12688/wellcomeopenres.10004.1},    url = {https://wellcomeopenresearch.org/articles/1-14},    note = {R package version 1.27.0},  }
+
+
+@article{gProfiler,
+    author = {Reimand, Jüri and Kull, Meelis and Peterson, Hedi and Hansen, Jaanus and Vilo, Jaak},
+    title = "{g:Profiler—a web-based toolset for functional profiling of gene lists from large-scale experiments}",
+    journal = {Nucleic Acids Research},
+    volume = {35},
+    number = {suppl_2},
+    pages = {W193-W200},
+    year = {2007},
+    month = {07},
+    abstract = "{g:Profiler (http://biit.cs.ut.ee/gprofiler/) is a public web server for characterising and manipulating gene lists resulting from mining high-throughput genomic data. g:Profiler has a simple, user-friendly web interface with powerful visualisation for capturing Gene Ontology (GO), pathway, or transcription factor binding site enrichments down to individual gene levels. Besides standard multiple testing corrections, a new improved method for estimating the true effect of multiple testing over complex structures like GO has been introduced. Interpreting ranked gene lists is supported from the same interface with very efficient algorithms. Such ordered lists may arise when studying the most significantly affected genes from high-throughput data or genes co-expressed with the query gene. Other important aspects of practical data analysis are supported by modules tightly integrated with g:Profiler. These are: g:Convert for converting between different database identifiers; g:Orth for finding orthologous genes from other species; and g:Sorter for searching a large body of public gene expression data for co-expression. g:Profiler supports 31 different species, and underlying data is updated regularly from sources like the Ensembl database. Bioinformatics communities wishing to integrate with g:Profiler can use alternative simple textual outputs.}",
+    issn = {0305-1048},
+    doi = {10.1093/nar/gkm226},
+    url = {https://doi.org/10.1093/nar/gkm226},
+    eprint = {https://academic.oup.com/nar/article-pdf/35/suppl\_2/W193/16746817/gkm226.pdf},
+}
+
+
+@Article{gprofiler2,    title = {gprofiler2-- an R package for gene list functional enrichment analysis and namespace conversion toolset g:Profiler},    journal = {F1000Research},    author = {Liis Kolberg and Uku Raudvere and Ivan Kuzmin and Jaak Vilo and Hedi Peterson},    volume = {9 (ELIXIR)},    number = {709},    year = {2020},    note = {R package version 0.2.1},  }
+
+@article{Jonas,
+title = {Severe COVID-19 Is Marked by a Dysregulated Myeloid Cell Compartment},
+journal = {Cell},
+volume = {182},
+number = {6},
+pages = {1419-1440.e23},
+year = {2020},
+issn = {0092-8674},
+doi = {https://doi.org/10.1016/j.cell.2020.08.001},
+url = {https://www.sciencedirect.com/science/article/pii/S0092867420309922},
+author = {Jonas Schulte-Schrepping and Nico Reusch and Daniela Paclik and Kevin Baßler and Stephan Schlickeiser and Bowen Zhang and Benjamin Krämer and Tobias Krammer and Sophia Brumhard and Lorenzo Bonaguro and Elena {De Domenico} and Daniel Wendisch and Martin Grasshoff and Theodore S. Kapellos and Michael Beckstette and Tal Pecht and Adem Saglam and Oliver Dietrich and Henrik E. Mei and Axel R. Schulz and Claudia Conrad and Désirée Kunkel and Ehsan Vafadarnejad and Cheng-Jian Xu and Arik Horne and Miriam Herbert and Anna Drews and Charlotte Thibeault and Moritz Pfeiffer and Stefan Hippenstiel and Andreas Hocke and Holger Müller-Redetzky and Katrin-Moira Heim and Felix Machleidt and Alexander Uhrig and Laure {Bosquillon de Jarcy} and Linda Jürgens and Miriam Stegemann and Christoph R. Glösenkamp and Hans-Dieter Volk and Christine Goffinet and Markus Landthaler and Emanuel Wyler and Philipp Georg and Maria Schneider and Chantip Dang-Heine and Nick Neuwinger and Kai Kappert and Rudolf Tauber and Victor Corman and Jan Raabe and Kim Melanie Kaiser and Michael To Vinh and Gereon Rieke and Christian Meisel and Thomas Ulas and Matthias Becker and Robert Geffers and Martin Witzenrath and Christian Drosten and Norbert Suttorp and Christof {von Kalle} and Florian Kurth and Kristian Händler and Joachim L. Schultze and Anna C. Aschenbrenner and Yang Li and Jacob Nattermann and Birgit Sawitzki and Antoine-Emmanuel Saliba and Leif Erik Sander and Angel Angelov and Robert Bals and Alexander Bartholomäus and Anke Becker and Daniela Bezdan and Ezio Bonifacio and Peer Bork and Thomas Clavel and Maria Colome-Tatche and Andreas Diefenbach and Alexander Dilthey and Nicole Fischer and Konrad Förstner and Julia-Stefanie Frick and Julien Gagneur and Alexander Goesmann and Torsten Hain and Michael Hummel and Stefan Janssen and Jörn Kalinowski and René Kallies and Birte Kehr and Andreas Keller and Sarah Kim-Hellmuth and Christoph Klein and Oliver Kohlbacher and Jan O. Korbel and Ingo Kurth and Markus Landthaler and Yang Li and Kerstin Ludwig and Oliwia Makarewicz and Manja Marz and Alice McHardy and Christian Mertes and Markus Nöthen and Peter Nürnberg and Uwe Ohler and Stephan Ossowski and Jörg Overmann and Silke Peter and Klaus Pfeffer and Anna R. Poetsch and Alfred Pühler and Nikolaus Rajewsky and Markus Ralser and Olaf Rieß and Stephan Ripke and Ulisses {Nunes da Rocha} and Philip Rosenstiel and Antoine-Emmanuel Saliba and Leif Erik Sander and Birgit Sawitzki and Philipp Schiffer and Eva-Christina Schulte and Joachim L. Schultze and Alexander Sczyrba and Oliver Stegle and Jens Stoye and Fabian Theis and Janne Vehreschild and Jörg Vogel and Max {von Kleist} and Andreas Walker and Jörn Walter and Dagmar Wieczorek and John Ziebuhr},
+keywords = {COVID-19, SARS-CoV-2, monocytes, neutrophils, dysfunctional neutrophils, emergency myelopoiesis, immune profiling, scRNA-seq, mass cytometry},
+abstract = {Summary
+Coronavirus disease 2019 (COVID-19) is a mild to moderate respiratory tract infection, however, a subset of patients progress to severe disease and respiratory failure. The mechanism of protective immunity in mild forms and the pathogenesis of severe COVID-19 associated with increased neutrophil counts and dysregulated immune responses remain unclear. In a dual-center, two-cohort study, we combined single-cell RNA-sequencing and single-cell proteomics of whole-blood and peripheral-blood mononuclear cells to determine changes in immune cell composition and activation in mild versus severe COVID-19 (242 samples from 109 individuals) over time. HLA-DRhiCD11chi inflammatory monocytes with an interferon-stimulated gene signature were elevated in mild COVID-19. Severe COVID-19 was marked by occurrence of neutrophil precursors, as evidence of emergency myelopoiesis, dysfunctional mature neutrophils, and HLA-DRlo monocytes. Our study provides detailed insights into the systemic immune response to SARS-CoV-2 infection and reveals profound alterations in the myeloid cell compartment associated with severe COVID-19.}
+}
+
+
+@article{Renuka,
+title = {Proteomic investigation reveals dominant alterations of neutrophil degranulation and mRNA translation pathways in patients with COVID-19},
+journal = {iScience},
+volume = {24},
+number = {3},
+pages = {102135},
+year = {2021},
+issn = {2589-0042},
+doi = {https://doi.org/10.1016/j.isci.2021.102135},
+url = {https://www.sciencedirect.com/science/article/pii/S2589004221001036},
+author = {Renuka Bankar and Kruthi Suvarna and Saicharan Ghantasala and Arghya Banerjee and Deeptarup Biswas and Manisha Choudhury and Viswanthram Palanivel and Akanksha Salkar and Ayushi Verma and Avinash Singh and Amrita Mukherjee and Medha Gayathri J. Pai and Jyotirmoy Roy and Alisha Srivastava and Apoorva Badaya and Sachee Agrawal and Om Shrivastav and Jayanthi Shastri and Sanjeeva Srivastava},
+keywords = {specimen, molecular biology, proteomics},
+abstract = {Summary
+The altered molecular proteins and pathways in response to COVID-19 infection are still unclear. Here, we performed a comprehensive proteomics-based investigation of nasopharyngeal swab samples from patients with COVID-19 to study the host response by employing simple extraction strategies. Few of the host proteins such as interleukin-6, L-lactate dehydrogenase, C-reactive protein, Ferritin, and aspartate aminotransferase were found to be upregulated only in COVID-19-positive patients using targeted multiple reaction monitoring studies. The most important pathways identified by enrichment analysis were neutrophil degranulation, interleukin-12 signaling pathways, and mRNA translation of proteins thus providing the detailed investigation of host response in COVID-19 infection. Thus, we conclude that mass spectrometry-detected host proteins have a potential for disease severity progression; however, suitable validation strategies should be deployed for the clinical translation. Furthermore, the in silico docking of potential drugs with host proteins involved in the interleukin-12 signaling pathway might aid in COVID-19 therapeutic interventions.}
+}
+
