@@ -7,3 +7,8 @@ The Assignment 1 html is: https://github.com/bcb420-2022/Xinyi_Xu/blob/main/A1.n
 
 The Assignment 1 rmd is: https://github.com/bcb420-2022/Xinyi_Xu/blob/main/A1.Rmd
 
+The Assignment 2 html is: https://github.com/bcb420-2022/Xinyi_Xu/blob/main/A2_XinyiXu.html
+
+The Assignment 2 rmd is: https://github.com/bcb420-2022/Xinyi_Xu/blob/main/A2_XinyiXu.Rmd
+
+Journal of A2: https://github.com/bcb420-2022/Xinyi_Xu/wiki/10.-Differential-Gene-expression-and-Preliminary-ORA
